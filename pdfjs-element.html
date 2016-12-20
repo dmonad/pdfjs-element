@@ -238,7 +238,7 @@ Display PDF files - stylable
         var self = this
         var len = this._pdfDocument.numPages
         var _container = this.$.pdfContainer
-        while (_container.firstChild != null && _container.children.length > len) {
+        while (_container.children.length > len) {
           _container.removeChild(_container.lastChild);
         }
         while (_container.children.length < len) {
@@ -246,7 +246,7 @@ Display PDF files - stylable
         }
         
         var promises = []
-        for (var i = 1; i < len; i++) {
+        for (var i = 1; i <= len; i++) {
           promises.push(this._drawPdfPage(i, _pdfUpscaleSize))
         }
         Promise.all(promises).then(function (divs) {
