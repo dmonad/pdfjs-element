@@ -42,7 +42,7 @@
       <h3>Basic pdfjs-element demo</h3>
       <demo-snippet>
         <template>
-          <pdfjs-element src="./A-Midsummer-Night.pdf" page-number="1"></pdfjs-element>
+          <pdfjs-element src="./A-Midsummer-Night.pdf" page="1"></pdfjs-element>
         </template>
       </demo-snippet>
     </div>
@@ -60,10 +60,10 @@
               </paper-listbox>
             </paper-dropdown-menu>
             <p>Page Number:</p>
-            <paper-slider label="Page Number" pin immediate-value="{{pageNumber}}" min="1" max="10"></paper-slider>
+            <paper-slider label="Page Number" pin immediate-value="{{pageNumber}}" min="1" max="{{numberOfPages}}"></paper-slider>
             <paper-input label="Page range (E.g. '1', '1-2', or '3-4,6-7')" value="{{pageRange}}"></paper-input>
           </div>
-          <pdfjs-element src="{{file}}" page-range="{{pageRange}}" page-number="{{pageNumber}}"></pdfjs-element>
+          <pdfjs-element src="{{file}}" page-range="{{pageRange}}" page="{{pageNumber}}" number-of-pages="{{numberOfPages}}"></pdfjs-element>
         </template>
       </demo-snippet>
     </div>

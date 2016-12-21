@@ -21,7 +21,11 @@
 `pdfjs-element`
 Display PDF files - stylable
 
-@demo demo/index.html 
+| Custom CSS property | Description
+| ---------------- | -------------
+| `--pdfjs-page`        | Style individual page
+
+@demo demo/index.html
 -->
 
 <dom-module id="pdfjs-element">
@@ -31,8 +35,6 @@ Display PDF files - stylable
         display: block;
         overflow: auto;
         padding-bottom: 10px;
-      }
-      #pdfContainer {
       }
       .page {
         @apply(--pdfjs-page)
@@ -53,41 +55,9 @@ Display PDF files - stylable
         this._drawingFinished = true
 
         this._isReady = true
-        this._pageNumberChanged()
+        this._pageChanged()
         this._pageRangeChanged()
         this._srcChanged()
-        /*
-        this._pdfLinkService = new PDFJS.PDFLinkService()
-        this._pdfViewer = new PDFJS.PDFViewer({
-          container: this.$.pdfContainer,
-          linkService: this._pdfLinkService
-        })
-        this._pdfLinkService.setViewer(this._pdfViewer)
-
-        /* TODO
-        var oldOnResize = window.onresize
-        window.onresize = function(){
-          if (oldOnResize != null) {
-            oldOnResize.apply(arguments)
-          }
-          var page = pdfViewer.currentPageNumber
-          pdfViewer.currentScaleValue = 'page-width'
-          pdfViewer.currentPageNumber = page
-        }
-        */
-        /*
-        
-        */
-        /*
-        this.$.pdfContainer.addEventListener('pagesinit', (function () {
-          fixEditor()
-        }).bind(this))
-        this.$.pdfContainer.addEventListener('pagesloaded', (function () {
-          setTimeout((function () {
-            this._pageNumberChanged()
-            this._pageRangeChanged()
-          }).bind(this), 100)
-        }).bind(this))*/
 
         var self = this
         this.addEventListener('iron-resize', this._scaleDrawing.bind(this))
@@ -116,16 +86,23 @@ Display PDF files - stylable
           notify: true
         },
         /**
-         * Page number. E.g. "1" will only show page 1
+         * Page number. E.g. "1" for the first page
          */
-        pageNumber: {
+        page: {
           type: Number,
-          observer: '_pageNumberChanged'
+          observer: '_pageChanged'
+        },
+        /**
+         * Number of pages for the current pdf file
+         */
+        numberOfPages: {
+          type: Number,
+          notify: true
         }
       },
-      _pageNumberChanged: function () {
-        if (this.pageNumber != null) {
-          this.pageRange = this.pageNumber + ''
+      _pageChanged: function () {
+        if (this.page != null) {
+          this.pageRange = this.page + ''
         }
       },
       _pageRangeChanged: function () {
@@ -234,17 +211,17 @@ Display PDF files - stylable
         }
         var _pdfUpscaleSize = this.getBoundingClientRect().width - this._scrollbar_padding
         var self = this
-        var len = this._pdfDocument.numPages
+        this.numberOfPages = this._pdfDocument.numPages
         var _container = this.$.pdfContainer
-        while (_container.children.length > len) {
+        while (_container.children.length > this.numberOfPages) {
           _container.removeChild(_container.lastChild);
         }
-        while (_container.children.length < len) {
+        while (_container.children.length < this.numberOfPages) {
           this.$.pdfContainer.append(document.createElement('div'))
         }
         
         var promises = []
-        for (var i = 1; i <= len; i++) {
+        for (var i = 1; i <= this.numberOfPages; i++) {
           promises.push(this._drawPdfPage(i, _pdfUpscaleSize))
         }
         Promise.all(promises).then(function (divs) {
