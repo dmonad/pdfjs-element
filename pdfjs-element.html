@@ -30,12 +30,9 @@ Display PDF files - stylable
       :host {
         display: block;
         overflow: auto;
-        position: relative;
+        padding-bottom: 10px;
       }
       #pdfContainer {
-        position: absolute;
-        top: 0;
-        left: 0;
       }
       .page {
         @apply(--pdfjs-page)
@@ -221,6 +218,7 @@ Display PDF files - stylable
             return Promise.resolve(div)
           }) 
         } else {
+          div.style.display = 'none'
           return Promise.resolve(div)
         }
       },
@@ -250,7 +248,7 @@ Display PDF files - stylable
           promises.push(this._drawPdfPage(i, _pdfUpscaleSize))
         }
         Promise.all(promises).then(function (divs) {
-          while(_container.firstChild != null) {
+          while(_container.lastChild != null) {
             _container.removeChild(_container.lastChild)
           }
           divs.forEach(function (div) {
