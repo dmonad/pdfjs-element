@@ -6,10 +6,6 @@
 <script src="../pdfjs-dist/build/pdf.min.js"></script>
 <script src="../pdfjs-dist/web/pdf_viewer.js"></script>
 
-<script>
-  PDFJS.workerSrc = '../../pdfjs-dist/build/pdf.worker.min.js'
-</script>
-
 <style>
   .page {
     position: relative;
@@ -78,6 +74,14 @@
           observer: '_srcChanged'
         },
         /**
+         * Path to pdfjs web worker
+         */
+        pdfjsWorkerPath: {
+          type: String,
+          observer: '_workerPathChanged',
+          value: '/bower_components/pdfjs-dist/build/pdf.worker.min.js'
+        },
+        /**
          * Page range. E.g. "1", 1-2", or "3-4,6-7"
          */
         pageRange: {
@@ -99,6 +103,9 @@
           type: Number,
           notify: true
         }
+      },
+      _workerPathChanged: function () {
+        PDFJS.workerSrc = this.pdfjsWorkerPath
       },
       _pageChanged: function () {
         if (this.page != null) {
