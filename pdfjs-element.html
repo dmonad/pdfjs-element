@@ -158,7 +158,7 @@
           return
         var propScroll = this.scrollTop / this.scale || 0
         this.scale = (this.getBoundingClientRect().width - this._scrollbar_padding) / _pdfUpscaleSize
-        this.$.pdfContainer.setAttribute('style', `transform-origin: 0 0; transform: scale(${ this.scale });`)
+        this.$.pdfContainer.setAttribute('style', 'transform-origin: 0 0; transform: scale(' + this.scale + ');')
         this.scrollTop = propScroll * this.scale
       },
       _scaleDrawing: function (_pdfUpscaleSize) {
