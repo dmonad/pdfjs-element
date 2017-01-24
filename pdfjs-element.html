@@ -41,6 +41,11 @@
 
   <script>
     Polymer({
+      created: function () {
+        if (PDFJS.workerSrc == null) {
+          PDFJS.workerSrc = '/bower_components/pdfjs-dist/build/pdf.worker.min.js'
+        }
+      },
       ready: function () {
         this.scopeSubtree(this.$.pdfContainer, true)
 
@@ -58,7 +63,10 @@
         var self = this
         this.addEventListener('iron-resize', this._scaleDrawing.bind(this))
         setInterval(function () {
-          if (self.scale != null && self.scale !== 1 && new Date() - self.lastScaleDrawing > 500 && !this.scaling) {
+          if (self.scale != null &&
+              self.scale !== 1 &&
+              new Date() - self.lastScaleDrawing > 500 &&
+              !this.scaling) {
             self._drawPdfDocument(true)
           }
         }, 1000)
@@ -74,12 +82,11 @@
           observer: '_srcChanged'
         },
         /**
-         * Path to pdfjs web worker
+         * Path to pdfjs web worker. Defauld: '/bower_components/pdfjs-dist/build/pdf.worker.min.js'
          */
         pdfjsWorkerPath: {
           type: String,
-          observer: '_workerPathChanged',
-          value: '/bower_components/pdfjs-dist/build/pdf.worker.min.js'
+          observer: '_workerPathChanged'
         },
         /**
          * Page range. E.g. "1", 1-2", or "3-4,6-7"
@@ -122,7 +129,7 @@
             // parse page to pages
             pages = this.pageRange.split(',').map(function (p) {
               var r = p.split('-')
-              if (r.length > 2 || r.length == 0) {
+              if (r.length > 2 || r.length === 0) {
                 throw new Error('Invalid')
               }
               r = r.map(Number)
@@ -143,7 +150,7 @@
           return
         }
         var self = this
-        PDFJS.getDocument(this.src).then(function(pdfDocument) {
+        PDFJS.getDocument(this.src).then(function (pdfDocument) {
           self._pdfDocument = pdfDocument
           self._drawPdfDocument()
         })
@@ -154,8 +161,9 @@
         }
         this.lastScaleDrawing = new Date()
         _pdfUpscaleSize = typeof _pdfUpscaleSize === 'number' ? _pdfUpscaleSize : this._pdfUpscaleSize
-        if (_pdfUpscaleSize == null)
+        if (_pdfUpscaleSize == null) {
           return
+        }
         var propScroll = this.scrollTop / this.scale || 0
         this.scale = (this.getBoundingClientRect().width - this._scrollbar_padding) / _pdfUpscaleSize
         this.$.pdfContainer.setAttribute('style', 'transform-origin: 0 0; transform: scale(' + this.scale + ');')
@@ -167,7 +175,7 @@
         }
         if (this._scaling !== true) {
           this._scaling = true
-          
+
           var self = this
           window.requestAnimationFrame(function () {
             self._scaling = false
@@ -180,7 +188,6 @@
           return
         }
         const CSS_UNITS = 96.0 / 72.0 // needed to scale pdfjs. check https://github.com/mozilla/pdf.js/blob/7d8fa1385d47e180cdba32a2e63d87d5c4132d7f/web/ui_utils.js
-        var self = this
         var div = document.createElement('div')
         if (this._pageRange.some(function (range) {
           return range[0] <= i && i <= range[1]
@@ -200,7 +207,7 @@
             return pdfPageView.draw()
           }).then(function () {
             return Promise.resolve(div)
-          }) 
+          })
         } else {
           div.style.display = 'none'
           return Promise.resolve(div)
@@ -221,18 +228,18 @@
         this.numberOfPages = this._pdfDocument.numPages
         var _container = this.$.pdfContainer
         while (_container.children.length > this.numberOfPages) {
-          _container.removeChild(_container.lastChild);
+          _container.removeChild(_container.lastChild)
         }
         while (_container.children.length < this.numberOfPages) {
           this.$.pdfContainer.append(document.createElement('div'))
         }
-        
+
         var promises = []
         for (var i = 1; i <= this.numberOfPages; i++) {
           promises.push(this._drawPdfPage(i, _pdfUpscaleSize))
         }
         Promise.all(promises).then(function (divs) {
-          while(_container.lastChild != null) {
+          while (_container.lastChild != null) {
             _container.removeChild(_container.lastChild)
           }
           divs.forEach(function (div) {
